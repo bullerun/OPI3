@@ -1,10 +1,14 @@
+import javax.xml.transform.stream.StreamSource
+import javax.xml.validation.SchemaFactory
+
 plugins {
     id 'java'
     id 'war'
 }
 
-
-
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
 repositories {
     mavenCentral()
 }
@@ -13,10 +17,6 @@ ext {
     junitVersion = '5.9.2'
 }
 
-
-tasks.withType(JavaCompile).configureEach {
-    options.encoding = 'UTF-8'
-}
 
 dependencies {
     compileOnly('jakarta.enterprise:jakarta.enterprise.cdi-api:4.0.1')
@@ -44,10 +44,178 @@ dependencies {
     compileOnly('jakarta.ejb:jakarta.ejb-api:4.0.1') //
 
 
-
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+    testImplementation 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.10.2'
+    testImplementation 'org.junit.platform:junit-platform-console-standalone:1.10.2'
+}
+tasks.register('history') {
+    group = 'OPI'
+    println "history"
+//    exec {
+//        commandLine 'git', 'checkout', 'HEAD~1'
+//    }
+//    doLast {
+//        compileOPI
+//    }
 
 }
+// src dirs
+def srcDirMain = "${projectDir.path}/src/main"
+def srcDirTest = "${projectDir.path}/src/test"
 
-test {
+// temporary folders with deps & artifact dirs
+def depsDirMain = "${buildDir}/deps-main"
+def depsDirTest = "${buildDir}/deps-test"
+def outputArtefactsDir = "${buildDir}/libs"
+
+// source sets compilation results
+def compiledMain = "${buildDir}/classes/java/main"
+def compiledTest = "${buildDir}/classes/java/test"
+
+// temporary dir for war assembling
+def warAssemblingDir = "${buildDir}/war-tmp"
+
+// testing reports dir
+def testingReportsDir = "${projectDir.path}/reports"
+
+// junit testing jar
+def junitPlatformConsoleJar = 'junit-platform-console-standalone-1.10.2.jar'
+
+
+def mainSourceSet = sourceSets.main
+def testSourceSet = sourceSets.test
+
+tasks.register('CompileOPI') {
+    description = 'Компилирует все файлы проекта.'
+    group = 'OPI'
+    try {
+        exec {
+            workingDir projectDir
+            commandLine 'cmd', '/c', 'gradlew', 'compileJava'
+        }
+    } catch (Exception ignored) {
+        history
+    }
+    doLast {
+        mkdir(warAssemblingDir)
+        copy {
+            into("${warAssemblingDir}/WEB-INF")
+            from("${srcDirMain}/webapp/WEB-INF/faces-config.xml")
+            from("${srcDirMain}/webapp/WEB-INF/web.xml")
+            from("${srcDirMain}/webapp/WEB-INF/beans.xml")
+            from("${compiledMain}") { into("classes") }
+            from(mainSourceSet.runtimeClasspath) { into('lib') include('*.jar') }
+        }
+
+        copy {
+            from("${srcDirMain}/webapp/resources")
+            into("${warAssemblingDir}/resources")
+        }
+        copy {
+            from("${srcDirMain}/webapp/layout")
+            into("${warAssemblingDir}/layout")
+        }
+        copy {
+            into(warAssemblingDir)
+            from("${srcDirMain}/webapp/index.xhtml")
+            from("${srcDirMain}/webapp/main.xhtml")
+        }
+    }
+}
+
+// Задача для сборки проекта в WAR
+tasks.register('BuildOPI', Exec) {
+    description = 'Собирает проект в WAR файл.'
+    group = 'OPI'
+    dependsOn CompileOPI
+    mkdir(outputArtefactsDir)
+    commandLine 'jar', '-cf', "${outputArtefactsDir}/${project.name}OPI.war", '-C', warAssemblingDir, '.'
+    doLast {
+        playMusic
+    }
+}
+tasks.register("cleanOPI") {
+    description = 'Удаляет все сгенерированные файлы и директории сборки.'
+    group = 'OPI'
+    delete rootProject.buildDir
+}
+tasks.register("testOPI", Test) {
+    group = 'OPI'
     useJUnitPlatform()
+    dependsOn build
 }
+tasks.register('playMusic') {
+    group = 'OPI'
+    exec {
+        commandLine 'cmd', '/c', "myMusic.mp3"
+    }
+}
+tasks.register('native2ascii') {
+    def inputDir = file('src/main/webapp/resources/asciiOld')
+    def outputDir = file('src/main/webapp/resources/asciiNew/')
+
+    doLast {
+        ant.native2ascii(
+                src: project.file(inputDir),
+                dest: project.file(outputDir)
+        )
+    }
+}
+
+// 3. Валидация всех XML-файлов в проекте
+tasks.register('validateXml') {
+    group = 'OPI'
+    doLast {
+        fileTree('src/main').include('**/*.xml').each { file ->
+            def schemaFactory = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema")
+            def schema = schemaFactory.newSchema()
+            def validator = schema.newValidator()
+            try {
+                validator.validate(new StreamSource(file as File))
+                println "${file} is valid."
+            } catch (Exception e) {
+                println "${file} is not valid because ${e.message}"
+            }
+        }
+    }
+}
+
+// 4. Сохранение отчета junit в Git
+tasks.register('report') {
+    group = 'OPI'
+    doLast {
+        def testResults = file("${buildDir}/test-results/testOPI")
+        if (testResults.exists()) {
+            exec {
+                commandLine 'git', 'add', testResults.absolutePath
+            }
+            exec {
+                commandLine 'git', 'commit', '-m', 'Adding test results'
+            }
+        }
+    }
+}
+
+// 6. Сборка и запуск программы в альтернативных окружениях
+tasks.register('env') {
+    group = 'OPI'
+
+    copy {
+        from("${buildDir}/libs/WebLab3.war")
+        into("C:\\Users\\nikitosek\\wildfly-29.0.1.Final\\standalone\\deployments")
+    }
+    doLast {
+        def environments = [
+                [args: '-Xms512m -Xmx1024m'],
+        ]
+        environments.each { env ->
+            exec {
+                commandLine 'cmd', '/c', 'set', 'JAVA_OPTS=', '-Xms512m', 'Xmx1024m'
+                commandLine 'cmd', '/c', 'set'
+//                commandLine 'cmd', '/c','call', "C:\\Users\\nikitosek\\wildfly-29.0.1.Final\\bin\\standalone.bat"
+            }
+        }
+    }
+}
+

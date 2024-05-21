@@ -42,6 +42,38 @@ public class Point implements Serializable {
     @NotNull
     private boolean result;
 
+    public float getX() {
+        return x;
+    }
+
+    public void setX(float x) {
+        this.x = x;
+    }
+
+    public float getY() {
+        return y;
+    }
+
+    public void setY(float y){
+        this.y = y;
+    }
+
+    public int getR() {
+        return r;
+    }
+
+    public void setR(int r) {
+        this.r = r;
+    }
+
+    public boolean isResult() {
+        return result;
+    }
+
+    public void setResult(boolean result) {
+        this.result = result;
+    }
+
     public boolean isHit() {
         return checkSquare() || checkCircle() || checkTriangle();
     }
