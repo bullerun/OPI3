@@ -22,7 +22,6 @@ public class ManagerDBTest {
     public void test() {
         assertEquals(1, point.getX());
         point.setX(3);
-        System.out.println("как то-так");
         assertEquals(3,point.getX(), " ");
     }
 }

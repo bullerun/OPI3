@@ -189,7 +189,6 @@ tasks.register('report') {
     group = 'OPI'
     println "report"
 
-    mkdir("${rootProject}/report")
     copy {
         from("${buildDir}/test-results/testOPI/*.xml")
         into("/report")
