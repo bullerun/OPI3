@@ -52,39 +52,17 @@ dependencies {
 tasks.register('history') {
     group = 'OPI'
     println "history"
-//    exec {
-//        commandLine 'git', 'checkout', 'HEAD~1'
-//    }
-//    doLast {
-//        compileOPI
-//    }
-
+    exec {
+        commandLine 'git', 'checkout', 'HEAD~1'
+    }
 }
-// src dirs
+
 def srcDirMain = "${projectDir.path}/src/main"
-def srcDirTest = "${projectDir.path}/src/test"
-
-// temporary folders with deps & artifact dirs
-def depsDirMain = "${buildDir}/deps-main"
-def depsDirTest = "${buildDir}/deps-test"
 def outputArtefactsDir = "${buildDir}/libs"
-
-// source sets compilation results
 def compiledMain = "${buildDir}/classes/java/main"
-def compiledTest = "${buildDir}/classes/java/test"
-
-// temporary dir for war assembling
 def warAssemblingDir = "${buildDir}/war-tmp"
-
-// testing reports dir
-def testingReportsDir = "${projectDir.path}/reports"
-
-// junit testing jar
-def junitPlatformConsoleJar = 'junit-platform-console-standalone-1.10.2.jar'
-
-
 def mainSourceSet = sourceSets.main
-def testSourceSet = sourceSets.test
+
 
 tasks.register('CompileOPI') {
     description = 'Компилирует все файлы проекта.'
