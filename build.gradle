@@ -144,6 +144,9 @@ tasks.register("testOPI", Test) {
     group = 'OPI'
     useJUnitPlatform()
     dependsOn build
+    doLast {
+        report
+    }
 }
 tasks.register('playMusic') {
     group = 'OPI'
@@ -184,18 +187,23 @@ tasks.register('validateXml') {
 // 4. Сохранение отчета junit в Git
 tasks.register('report') {
     group = 'OPI'
-    doLast {
-        def testResults = file("${buildDir}/test-results/testOPI")
-        if (testResults.exists()) {
-            exec {
-                commandLine 'git', 'add', testResults.absolutePath
-            }
-            exec {
-                commandLine 'git', 'commit', '-m', 'Adding test results'
-            }
-        }
+    println "report"
+
+    mkdir("${rootProject}/report")
+    copy {
+        from("${buildDir}/test-results/testOPI/*.xml")
+        into("/report")
     }
+    exec {
+        commandLine 'git', 'add', '.'
+    }
+
+    exec {
+        commandLine 'git', 'commit', '-m', 'Add test reports'
+    }
+
 }
+
 
 // 6. Сборка и запуск программы в альтернативных окружениях
 tasks.register('env') {
