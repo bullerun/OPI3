@@ -191,7 +191,7 @@ tasks.register('report') {
 
     mkdir("${rootProject}/report")
     copy {
-        from("${buildDir}/test-results/testOPI/")
+        from("${buildDir}/test-results/testOPI/*.xml")
         into("/report")
     }
     exec {
