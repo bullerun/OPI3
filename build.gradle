@@ -197,8 +197,8 @@ tasks.register('env') {
         environments.each { env ->
             exec {
                 commandLine 'cmd', '/c', 'set', 'JAVA_OPTS=', '-Xms512m', 'Xmx1024m'
-                commandLine 'cmd', '/c', 'set'
-//                commandLine 'cmd', '/c','call', "C:\\Users\\nikitosek\\wildfly-29.0.1.Final\\bin\\standalone.bat"
+
+                commandLine 'cmd', '/c','call', "C:\\Users\\nikitosek\\wildfly-29.0.1.Final\\bin\\standalone.bat"
             }
         }
     }
