@@ -50,6 +50,7 @@ dependencies {
     testImplementation 'org.junit.platform:junit-platform-console-standalone:1.10.2'
 }
 tasks.register('history') {
+    group "opi"
     doLast {
         def success = false
         def diffResult = ""
@@ -156,7 +157,9 @@ tasks.register('CompileOPI') {
             commandLine 'cmd', '/c', 'gradlew', 'compileJava'
         }
     } catch (Exception ignored) {
-        history
+        exec {
+            commandLine 'cmd', '/c', 'gradlew', 'history'
+        }
     }
     doLast {
         mkdir(warAssemblingDir)
@@ -220,10 +223,8 @@ tasks.register('native2ascii') {
     def outputDir = file('src/main/webapp/resources/asciiNew/')
 
     doLast {
-        ant.native2ascii(
-                src: project.file(inputDir),
-                dest: project.file(outputDir)
-        )
+        ant.native2ascii(src: project.file(inputDir),
+                dest: project.file(outputDir))
     }
 }
 
