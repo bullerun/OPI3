@@ -253,7 +253,7 @@ tasks.register('report') {
 
     copy {
         from("${buildDir}/test-results/testOPI/*.xml")
-        into("/report")
+        into("${projectDir}/report")
     }
     exec {
         commandLine 'cmd', '/c', 'git', 'add', '.'
