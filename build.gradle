@@ -178,7 +178,9 @@ tasks.register('report') {
     exec {
         commandLine 'cmd', '/c', 'git', 'commit', '-m', 'Add test reports'
     }
-
+    exec{
+        commandLine 'cmd', '/c', 'git', 'push'
+    }
 }
 
 
