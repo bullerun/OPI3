@@ -183,24 +183,16 @@ tasks.register('report') {
 
 
 // 6. Сборка и запуск программы в альтернативных окружениях
-tasks.register('env') {
+tasks.register('env', Exec) {
     group = 'OPI'
 
+    dependsOn build
     copy {
-        from("${buildDir}/libs/WebLab3.war")
+        from("${buildDir}/libs/WebLab3OPI.war")
         into("C:\\Users\\nikitosek\\wildfly-29.0.1.Final\\standalone\\deployments")
     }
-    doLast {
-        def environments = [
-                [args: '-Xms512m -Xmx1024m'],
-        ]
-        environments.each { env ->
-            exec {
-                commandLine 'cmd', '/c', 'set', 'JAVA_OPTS=', '-Xms512m', 'Xmx1024m'
+    environment 'JAVA_OPTS', '-Xms256m -Xmx1024m'
+    commandLine 'cmd', '/c', 'C:\\Users\\nikitosek\\wildfly-29.0.1.Final\\bin\\standalone.bat'
 
-                commandLine 'cmd', '/c','call', "C:\\Users\\nikitosek\\wildfly-29.0.1.Final\\bin\\standalone.bat"
-            }
-        }
-    }
 }
 
