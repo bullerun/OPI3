@@ -172,11 +172,11 @@ tasks.register('report') {
         into("/report")
     }
     exec {
-        commandLine 'git', 'add', '.'
+        commandLine 'cmd', '/c', 'git', 'add', '.'
     }
 
     exec {
-        commandLine 'git', 'commit', '-m', 'Add test reports'
+        commandLine 'cmd', '/c', 'git', 'commit', '-m', 'Add test reports'
     }
 
 }
