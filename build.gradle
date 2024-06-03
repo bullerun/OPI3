@@ -252,10 +252,10 @@ tasks.register('report') {
     println "report"
 
     copy {
-        println("${buildDir}/test-results/testOPI/*.xml")
+        println("${buildDir}/test-results/testOPI/")
         println("${projectDir}/report")
-        from("${buildDir}/test-results/testOPI/*.xml")
-        into("${projectDir}/report")
+        from("${buildDir}/test-results/testOPI/")
+        into("${projectDir}/report/")
     }
     exec {
         commandLine 'cmd', '/c', 'git', 'add', '.'
