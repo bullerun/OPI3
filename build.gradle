@@ -275,8 +275,8 @@ tasks.register('env', Exec) {
     group = 'OPI'
     dependsOn build
     copy {
-        from("${buildDir}/libs/WebLab3OPI.war")
         into("C:\\Users\\nikitosek\\wildfly-29.0.1.Final\\standalone\\deployments")
+        from("${buildDir}/libs/WebLab3OPI.war")
     }
     environment 'JAVA_OPTS', '-Xms256m -Xmx1024m'
     commandLine 'cmd', '/c', 'C:\\Users\\nikitosek\\wildfly-29.0.1.Final\\bin\\standalone.bat'
