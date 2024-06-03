@@ -252,6 +252,8 @@ tasks.register('report') {
     println "report"
 
     copy {
+        println("${buildDir}/test-results/testOPI/*.xml")
+        println("${projectDir}/report")
         from("${buildDir}/test-results/testOPI/*.xml")
         into("${projectDir}/report")
     }
