@@ -271,7 +271,6 @@ tasks.register('report') {
 // 6. Сборка и запуск программы в альтернативных окружениях
 tasks.register('env', Exec) {
     group = 'OPI'
-
     dependsOn build
     copy {
         from("${buildDir}/libs/WebLab3OPI.war")
@@ -279,7 +278,6 @@ tasks.register('env', Exec) {
     }
     environment 'JAVA_OPTS', '-Xms256m -Xmx1024m'
     commandLine 'cmd', '/c', 'C:\\Users\\nikitosek\\wildfly-29.0.1.Final\\bin\\standalone.bat'
-
 }
 
 
