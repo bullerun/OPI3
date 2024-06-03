@@ -50,11 +50,94 @@ dependencies {
     testImplementation 'org.junit.platform:junit-platform-console-standalone:1.10.2'
 }
 tasks.register('history') {
-    group = 'OPI'
-    println "history"
-    exec {
-        commandLine 'git', 'checkout', 'HEAD~1'
+    doLast {
+        def success = false
+        def diffResult = ""
+        def outputStream
+        def count = 0
+        def commit = 'HEAD'
+        def prevCommit = commit + '^'
+        try {
+            exec {
+                workingDir projectDir
+                commandLine 'cmd', '/c', 'gradlew', 'compileJava'
+            }
+            success = true
+        } catch (Exception e) {
+            println "Compile error: ${e.message}"
+            success = false
+        }
+        println "Compile result: $success"
+        if (!success) {
+            def diffFile = file("$buildDir/diff.txt")
+
+            def successfullyLoaded = false
+
+            while (!successfullyLoaded) {
+
+                if (count == 0) {
+                    outputStream = new ByteArrayOutputStream()
+                    exec {
+
+                        commandLine 'git', 'diff'
+                        workingDir projectDir
+                        standardOutput = outputStream
+                    }
+                    diffResult = outputStream.toString()
+                    count = 1
+                    exec {
+                        commandLine 'git', 'reset', '--hard', commit
+                        workingDir projectDir
+                        ignoreExitValue true
+                    }
+                } else {
+                    exec {
+
+                        commandLine 'git', 'diff', prevCommit, commit
+                        workingDir projectDir
+                        standardOutput = outputStream
+                    }
+                    diffResult = outputStream.toString()
+                    exec {
+                        commandLine 'git', 'reset', '--hard', prevCommit
+                        workingDir projectDir
+                        ignoreExitValue true
+                    }
+
+                }
+
+                try {
+                    exec {
+                        workingDir projectDir
+                        commandLine 'cmd', '/c', 'gradlew', 'compileJava'
+                    }
+                    success = true
+                } catch (Exception e) {
+                    println "Compile error: ${e.message}"
+                    success = false
+                }
+                if (!success) {
+                    println "Failed to compile project, retrying..."
+                    commit = prevCommit
+                    prevCommit += '^'
+
+
+                } else {
+                    println "Project compiled successfully, diff in ${diffFile}"
+                    successfullyLoaded = true
+                    def outputFile = new File("diff.txt")
+                    outputFile.write(diffResult)
+                }
+
+            }
+
+
+        } else {
+            println "Project compiled successfully, no need to load previous revision"
+
+        }
     }
+
 }
 
 def srcDirMain = "${projectDir.path}/src/main"
@@ -178,7 +261,7 @@ tasks.register('report') {
     exec {
         commandLine 'cmd', '/c', 'git', 'commit', '-m', 'Add test reports'
     }
-    exec{
+    exec {
         commandLine 'cmd', '/c', 'git', 'push'
     }
 }
