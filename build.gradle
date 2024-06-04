@@ -147,7 +147,6 @@ def mainSourceSet = sourceSets.main
 
 
 tasks.register('CompileOPI') {
-    description = 'Компилирует все файлы проекта.'
     group = 'OPI'
     try {
         exec {
@@ -185,7 +184,6 @@ tasks.register('CompileOPI') {
     }
 }
 tasks.register('BuildOPI', Exec) {
-    description = 'Собирает проект в WAR файл.'
     group = 'OPI'
     dependsOn CompileOPI
     mkdir(outputArtefactsDir)
@@ -195,7 +193,6 @@ tasks.register('BuildOPI', Exec) {
     }
 }
 tasks.register("cleanOPI") {
-    description = 'Удаляет все сгенерированные файлы и директории сборки.'
     group = 'OPI'
     delete rootProject.buildDir
 }
