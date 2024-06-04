@@ -209,7 +209,7 @@ tasks.register("testOPI", Test) {
     dependsOn build
     useJUnitPlatform()
     doLast {
-        exec {commandLine 'cmd', '/c', 'gradlew', 'report'}
+        exec { commandLine 'cmd', '/c', 'gradlew', 'report' }
     }
 }
 tasks.register('playMusic') {
@@ -270,15 +270,17 @@ tasks.register('report') {
 
 
 // 6. Сборка и запуск программы в альтернативных окружениях
-tasks.register('env', Exec) {
+tasks.register('env') {
     group = 'OPI'
     dependsOn build
     copy {
-        into("C:\\Users\\nikitosek\\wildfly-29.0.1.Final\\standalone\\deployments")
-        from("${buildDir}/libs/WebLab3OPI.war")
+        from("${buildDir}/libs/")
+        into("C:\\Users\\nikitosek\\wildfly-29.0.1.Final\\standalone\\deployments\\")
     }
-    environment 'JAVA_OPTS', '-Xms256m -Xmx1024m'
-    commandLine 'cmd', '/c', 'C:\\Users\\nikitosek\\wildfly-29.0.1.Final\\bin\\standalone.bat'
+    exec {
+        environment 'JAVA_OPTS', '-Xms256m -Xmx1024m'
+        commandLine 'cmd', '/c', 'C:\\Users\\nikitosek\\wildfly-29.0.1.Final\\bin\\standalone.bat'
+    }
 }
 
 
