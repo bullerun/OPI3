@@ -60,7 +60,7 @@ tasks.register('history') {
         def prevCommit = commit + '^'
         try {
             exec {
-                workingDir projectDir
+
                 commandLine 'cmd', '/c', 'gradlew', 'compileJava'
             }
             success = true
@@ -81,27 +81,26 @@ tasks.register('history') {
                     exec {
 
                         commandLine 'git', 'diff'
-                        workingDir projectDir
+
                         standardOutput = outputStream
                     }
                     diffResult = outputStream.toString()
                     count = 1
                     exec {
                         commandLine 'git', 'reset', '--hard', commit
-                        workingDir projectDir
+
                         ignoreExitValue true
                     }
                 } else {
                     exec {
 
                         commandLine 'git', 'diff', prevCommit, commit
-                        workingDir projectDir
+
                         standardOutput = outputStream
                     }
                     diffResult = outputStream.toString()
                     exec {
                         commandLine 'git', 'reset', '--hard', prevCommit
-                        workingDir projectDir
                         ignoreExitValue true
                     }
 
@@ -109,7 +108,6 @@ tasks.register('history') {
 
                 try {
                     exec {
-                        workingDir projectDir
                         commandLine 'cmd', '/c', 'gradlew', 'compileJava'
                     }
                     success = true
@@ -153,7 +151,6 @@ tasks.register('CompileOPI') {
     group = 'OPI'
     try {
         exec {
-            workingDir projectDir
             commandLine 'cmd', '/c', 'gradlew', 'compileJava'
         }
     } catch (Exception ignored) {
@@ -187,8 +184,6 @@ tasks.register('CompileOPI') {
         }
     }
 }
-
-// Задача для сборки проекта в WAR
 tasks.register('BuildOPI', Exec) {
     description = 'Собирает проект в WAR файл.'
     group = 'OPI'
@@ -228,7 +223,6 @@ tasks.register('native2ascii') {
     }
 }
 
-// 3. Валидация всех XML-файлов в проекте
 tasks.register('validateXml') {
     group = 'OPI'
     doLast {
@@ -246,11 +240,9 @@ tasks.register('validateXml') {
     }
 }
 
-// 4. Сохранение отчета junit в Git
 tasks.register('report') {
     group = 'OPI'
     println "report"
-
     copy {
 
         from("${buildDir}/test-results/testOPI/*.xml")
