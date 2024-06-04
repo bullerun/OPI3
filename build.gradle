@@ -188,9 +188,8 @@ tasks.register('BuildOPI', Exec) {
     dependsOn CompileOPI
     mkdir(outputArtefactsDir)
     commandLine 'jar', '-cf', "${outputArtefactsDir}/${project.name}OPI.war", '-C', warAssemblingDir, '.'
-    doLast {
-        commandLine 'cmd', '/c', 'gradlew', 'playMusic'
-    }
+    commandLine 'cmd', '/c', 'gradlew', 'playMusic'
+
 }
 tasks.register("cleanOPI") {
     group = 'OPI'
